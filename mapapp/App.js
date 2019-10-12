@@ -42,12 +42,19 @@ export default function App() {
   if (error) {
     text = error;
   } else if (location) {
-    text = JSON.stringify(location);
+    text = location;
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.paragraph}>{text}</Text>
+      {text.coords ? (<>
+        <Text style={styles.paragraph}>Latitude</Text>
+        <Text style={styles.paragraph}>{text.coords.latitude}</Text>
+        <Text style={styles.paragraph}>Longitude</Text>
+        <Text style={styles.paragraph}>{text.coords.longitude}</Text>
+      </>) : (
+        <Text>Loading...</Text>
+      )}
     </View>
   );
 }
@@ -55,14 +62,12 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     paddingTop: Constants.statusBarHeight,
     backgroundColor: '#ecf0f1',
   },
   paragraph: {
     margin: 24,
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: 'left',
   },
 });

@@ -4,7 +4,7 @@ import { Platform, Text, View, StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
-import {Speech} from 'expo';
+import * as Speech from "expo-speech";
 
 export default function App() {
   let text = 'Waiting..';

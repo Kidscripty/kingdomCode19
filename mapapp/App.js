@@ -1,5 +1,6 @@
-import React, {useState, useEffect} from 'react';
-import { Platform, Text, View, StyleSheet, WebView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import MapView from 'react-native-maps';
+import { Platform, Text, View, StyleSheet } from 'react-native';
 
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
@@ -21,7 +22,7 @@ export default function App() {
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
   const reload = async () => {
-    while(true) {
+    while (true) {
       getLocation();
 
       await sleep(100);
@@ -45,7 +46,7 @@ export default function App() {
       setError('Permission to access location was denied');
     }
 
-    let response = await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High});
+    let response = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
     setLocation(response);
   };
 
@@ -54,7 +55,7 @@ export default function App() {
     setLocOfInterest(location);
     setTriggered("no");
   }
-  
+
   // This will get run every time the location updates
   useEffect(() => {
     // Run check on latitude and longitude
@@ -85,13 +86,11 @@ export default function App() {
   // This will read out the bible verse when triggered
   useEffect(() => {
     // If triggered then read verse
-    if (triggered == "yes")
-    {
+    if (triggered == "yes") {
       getVerse();
     }
     // Else if not triggered then stop reading verse
-    else
-    {
+    else {
       Speech.speak("");
     }
   }, [triggered]);
@@ -118,9 +117,20 @@ export default function App() {
         <Text style={styles.paragraph}>{location.coords.latitude}</Text>
         <Text style={styles.paragraph}>Longitude</Text>
         <Text style={styles.paragraph}>{location.coords.longitude}</Text>
+        <MapView
+          style={{
+            flex: 1
+          }}
+          initialRegion={{
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.0002,
+            longitudeDelta: 0.0002
+          }}
+        />
       </>) : (
-        <Text>Loading...</Text>
-      )}
+          <Text>Loading...</Text>
+        )}
       <Button
         onPress={saveLocation}
         title="Save Location"

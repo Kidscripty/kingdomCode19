@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// import { MapView, Marker } from 'react-native-maps';
 import MapView from 'react-native-maps';
 import { Platform, Text, View, StyleSheet, TextInput } from 'react-native';
 
@@ -10,7 +11,7 @@ import { Button } from 'react-native';
 
 export default function App() {
   // Constants
-  const GPSprecision=3; // Use GPS longitude/latitude to n decimal places
+  const GPSprecision = 3; // Use GPS longitude/latitude to n decimal places
 
   // State variables
   const [location, setLocation] = useState(null);
@@ -21,6 +22,7 @@ export default function App() {
   const [book, setBook] = useState("");
   const [chapter, setChapter] = useState("");
   const [verse, setVerse] = useState("");
+  const [latNLng, setLatNLng] = useState("");
 
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -34,9 +36,8 @@ export default function App() {
 
   // Get (and speak) bible verse
   const getVerse = async () => {
-    if (book !== "" && chapter !== "" && verse !== "")
-    {
-      const url = "https://bibleapi.co/api/verses/kjv/" + book + "/" + chapter + "/3" + verse;
+    if (book !== "" && chapter !== "" && verse !== "") {
+      const url = "https://bibleapi.co/api/verses/kjv/" + book + "/" + chapter + "/" + verse;
       const response = await fetch(url);
       const json = await response.json();
 
@@ -55,6 +56,11 @@ export default function App() {
 
     let response = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
     setLocation(response);
+    var latNlng = {
+      latitude: response.coords.latitude,
+      longitude: response.coords.longitude
+    };
+    setLatNLng(latNLng);
   };
 
   // Save the current location as the location of interest
@@ -68,23 +74,20 @@ export default function App() {
     // Run check on latitude and longitude
     // If not yet triggered AND location  matches location of interest
     //   Update as triggered
-    if (   location && location.coords
-        && locOfInterest && locOfInterest.coords)
-    {
+    if (location && location.coords
+      && locOfInterest && locOfInterest.coords) {
       var shortLocLat = location.coords.latitude.toPrecision(GPSprecision);
       var shortLocLong = location.coords.longitude.toPrecision(GPSprecision);
 
       var shortTargLat = locOfInterest.coords.latitude.toPrecision(GPSprecision);
       var shortTargLong = locOfInterest.coords.longitude.toPrecision(GPSprecision);
-      if (   shortLocLat == shortTargLat
-          && shortLocLong == shortTargLong)
-      {
+      if (shortLocLat == shortTargLat
+        && shortLocLong == shortTargLong) {
         setTriggered("yes");
       }
       // If triggered AND location does NOT match location of interest
       //   Update as NOT triggered
-      else
-      {
+      else {
         setTriggered("no");
       }
     }
@@ -119,24 +122,25 @@ export default function App() {
   // This is what the component renders. Gets returned every time there is a render
   return (
     <View style={styles.container}>
-       <Text style={styles.paragraph}>Book of bible</Text>
-       <TextInput
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+      <Text style={styles.paragraph}>Book of Bible</Text>
+      <TextInput
+        style={{ height: 40, backgroundColor: 'white', borderColor: 'gray', borderWidth: 1, textAlign: 'center' }}
         onChangeText={setBook}
         value={book}
-       />
-       <Text style={styles.paragraph}>Chapter</Text>
-       <TextInput
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+      />
+      <Text style={styles.paragraph}>Chapter</Text>
+      <TextInput
+        style={{ height: 40, backgroundColor: 'white', borderColor: 'gray', borderWidth: 1, textAlign: 'center' }}
         onChangeText={setChapter}
         value={chapter}
-       />
-       <Text style={styles.paragraph}>Verse</Text>
-       <TextInput
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+      />
+      <Text style={styles.paragraph}>Verse</Text>
+      <TextInput
+        style={{ height: 40, backgroundColor: 'white', borderColor: 'gray', borderWidth: 1, textAlign: 'center' }}
         onChangeText={setVerse}
         value={verse}
-       />
+      />
+      <Text style={styles.paragraph}>&nbsp;</Text>
       {(location && location.coords) ? (<>
         <MapView
           style={{
@@ -145,10 +149,13 @@ export default function App() {
           initialRegion={{
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
-            latitudeDelta: 0.0002,
-            longitudeDelta: 0.0002
-          }}
-        />
+            latitudeDelta: 0.002,
+            longitudeDelta: 0.002
+          }}>
+          {/* <marker coordinate={latNLng}
+            title="Hello"
+            description="How are you?" /> */}
+        </MapView>
       </>) : (
           <Text></Text>
         )}
@@ -158,11 +165,11 @@ export default function App() {
         color="#841584"
         accessibilityLabel="Save current location"
       />
-      {(triggered && triggered=="yes") ? (<>
-      <Text style={styles.paragraph}>{bibleVerse}</Text>
+      {(triggered && triggered == "yes") ? (<>
+        <Text style={styles.paragraph}>{bibleVerse}</Text>
       </>) : (
-        <Text></Text>
-      )}
+          <Text></Text>
+        )}
     </View>
   );
 }
@@ -175,8 +182,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#ecf0f1',
   },
   paragraph: {
-    margin: 24,
+    marginTop: 24,
+    marginBottom: 6,
     fontSize: 18,
-    textAlign: 'left',
+    textAlign: 'center',
   },
 });

@@ -43,6 +43,8 @@ export default function App() {
     // Run check on latitude and longitude
   }, [location]);
 
+  // DL just practising ting. Making comments and pushing them.
+
   // This will only get run once: when the component is first loaded
   useEffect(() => {
     getVerse();

@@ -122,23 +122,26 @@ export default function App() {
   // This is what the component renders. Gets returned every time there is a render
   return (
     <View style={styles.container}>
-      <Text style={styles.paragraph}>Book of Bible</Text>
+      <Text style={styles.paragraph}></Text>
       <TextInput
         style={{ height: 40, backgroundColor: 'white', borderColor: 'gray', borderWidth: 1, textAlign: 'center' }}
         onChangeText={setBook}
         value={book}
+        placeholder="Book of Bible"
       />
-      <Text style={styles.paragraph}>Chapter</Text>
+      <Text style={styles.paragraph}></Text>
       <TextInput
         style={{ height: 40, backgroundColor: 'white', borderColor: 'gray', borderWidth: 1, textAlign: 'center' }}
         onChangeText={setChapter}
         value={chapter}
+        placeholder="Chapter"
       />
-      <Text style={styles.paragraph}>Verse</Text>
+      <Text style={styles.paragraph}></Text>
       <TextInput
         style={{ height: 40, backgroundColor: 'white', borderColor: 'gray', borderWidth: 1, textAlign: 'center' }}
         onChangeText={setVerse}
         value={verse}
+        placeholder="Verse"
       />
       <Text style={styles.paragraph}>&nbsp;</Text>
       {(location && location.coords) ? (<>

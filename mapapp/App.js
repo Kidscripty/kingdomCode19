@@ -4,6 +4,7 @@ import { Platform, Text, View, StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
+import {Speech} from 'expo';
 
 export default function App() {
   let text = 'Waiting..';
@@ -21,7 +22,16 @@ export default function App() {
     }
   }
 
+  const getVerse = async () => {
+    const response = await fetch("https://bibleapi.co/api/verses/kjv/gn/1/1");
+    const json = await response.json();
+
+    Speech.speak(json.text);
+  }
+
   useEffect(() => {
+    getVerse();
+
     if (Platform.OS === 'android' && !Constants.isDevice) {
       setError('Oops, this will not work on Sketch in an Android emulator. Try it on your device!');
     } else {

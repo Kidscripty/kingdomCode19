@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { Platform, Text, View, StyleSheet } from 'react-native';
+import { Platform, Text, View, StyleSheet, WebView } from 'react-native';
 
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
@@ -8,11 +8,15 @@ import * as Speech from "expo-speech";
 import { Button } from 'react-native';
 
 export default function App() {
+  // Constants
+  const GPSprecision=3; // Use GPS longitude/latitude to n decimal places
+
   // State variables
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
   const [locOfInterest, setLocOfInterest] = useState(null);
   const [triggered, setTriggered] = useState(null);
+  const [bibleVerse, setBibleVerse] = useState(null);
 
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -28,6 +32,8 @@ export default function App() {
   const getVerse = async () => {
     const response = await fetch("https://bibleapi.co/api/verses/kjv/gn/3/3");
     const json = await response.json();
+
+    setBibleVerse(json.text);
 
     Speech.speak(json.text);
   }
@@ -54,15 +60,25 @@ export default function App() {
     // Run check on latitude and longitude
     // If not yet triggered AND location  matches location of interest
     //   Update as triggered
-    if (location == locOfInterest)
+    if (   location && location.coords
+        && locOfInterest && locOfInterest.coords)
     {
-      setTriggered("yes");
-    }
-    // If triggered AND location does NOT match location of interest
-    //   Update as NOT triggered
-    else
-    {
-      setTriggered("no");
+      var shortLocLat = location.coords.latitude.toPrecision(GPSprecision);
+      var shortLocLong = location.coords.longitude.toPrecision(GPSprecision);
+
+      var shortTargLat = locOfInterest.coords.latitude.toPrecision(GPSprecision);
+      var shortTargLong = locOfInterest.coords.longitude.toPrecision(GPSprecision);
+      if (   shortLocLat == shortTargLat
+          && shortLocLong == shortTargLong)
+      {
+        setTriggered("yes");
+      }
+      // If triggered AND location does NOT match location of interest
+      //   Update as NOT triggered
+      else
+      {
+        setTriggered("no");
+      }
     }
   }, [location]);
 
@@ -111,13 +127,10 @@ export default function App() {
         color="#841584"
         accessibilityLabel="Save current location"
       />
-      {(locOfInterest && location.coords) ? (<>
-        <Text style={styles.paragraph}>Latitude</Text>
-        <Text style={styles.paragraph}>{location.coords.latitude}</Text>
-        <Text style={styles.paragraph}>Longitude</Text>
-        <Text style={styles.paragraph}>{location.coords.longitude}</Text>
+      {(triggered && triggered=="yes") ? (<>
+      <Text style={styles.paragraph}>{bibleVerse}</Text>
       </>) : (
-        <Text>Nothing Saved.</Text>
+        <Text>Not triggered</Text>
       )}
     </View>
   );

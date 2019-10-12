@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MapView from 'react-native-maps';
-import { Platform, Text, View, StyleSheet } from 'react-native';
+import { Platform, Text, View, StyleSheet, TextInput } from 'react-native';
 
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
@@ -18,6 +18,9 @@ export default function App() {
   const [locOfInterest, setLocOfInterest] = useState(null);
   const [triggered, setTriggered] = useState(null);
   const [bibleVerse, setBibleVerse] = useState(null);
+  const [book, setBook] = useState("");
+  const [chapter, setChapter] = useState("");
+  const [verse, setVerse] = useState("");
 
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -31,12 +34,16 @@ export default function App() {
 
   // Get (and speak) bible verse
   const getVerse = async () => {
-    const response = await fetch("https://bibleapi.co/api/verses/kjv/gn/3/3");
-    const json = await response.json();
+    if (book !== "" && chapter !== "" && verse !== "")
+    {
+      const url = "https://bibleapi.co/api/verses/kjv/" + book + "/" + chapter + "/3" + verse;
+      const response = await fetch(url);
+      const json = await response.json();
 
-    setBibleVerse(json.text);
+      setBibleVerse(json.text);
 
-    Speech.speak(json.text);
+      Speech.speak(json.text);
+    }
   }
 
   // Get current location
@@ -112,11 +119,25 @@ export default function App() {
   // This is what the component renders. Gets returned every time there is a render
   return (
     <View style={styles.container}>
+       <Text style={styles.paragraph}>Book of bible</Text>
+       <TextInput
+        style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+        onChangeText={setBook}
+        value={book}
+       />
+       <Text style={styles.paragraph}>Chapter</Text>
+       <TextInput
+        style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+        onChangeText={setChapter}
+        value={chapter}
+       />
+       <Text style={styles.paragraph}>Verse</Text>
+       <TextInput
+        style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+        onChangeText={setVerse}
+        value={verse}
+       />
       {(location && location.coords) ? (<>
-        <Text style={styles.paragraph}>Latitude</Text>
-        <Text style={styles.paragraph}>{location.coords.latitude}</Text>
-        <Text style={styles.paragraph}>Longitude</Text>
-        <Text style={styles.paragraph}>{location.coords.longitude}</Text>
         <MapView
           style={{
             flex: 1
@@ -129,7 +150,7 @@ export default function App() {
           }}
         />
       </>) : (
-          <Text>Loading...</Text>
+          <Text></Text>
         )}
       <Button
         onPress={saveLocation}
@@ -140,7 +161,7 @@ export default function App() {
       {(triggered && triggered=="yes") ? (<>
       <Text style={styles.paragraph}>{bibleVerse}</Text>
       </>) : (
-        <Text>Not triggered</Text>
+        <Text></Text>
       )}
     </View>
   );

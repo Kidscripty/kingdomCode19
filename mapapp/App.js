@@ -7,8 +7,7 @@ import * as Permissions from 'expo-permissions';
 import * as Speech from "expo-speech";
 
 export default function App() {
-  let text = 'Waiting..';
-
+  // State variables
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
 
@@ -29,6 +28,22 @@ export default function App() {
     Speech.speak(json.text);
   }
 
+  const getLocation = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== 'granted') {
+      setError('Permission to access location was denied');
+    }
+
+    let response = await Location.getCurrentPositionAsync({});
+    setLocation(response);
+  };
+
+  // This will get run every time the location updates
+  useEffect(() => {
+    // Run check on latitude and longitude
+  }, [location]);
+
+  // This will only get run once: when the component is first loaded
   useEffect(() => {
     getVerse();
 
@@ -39,16 +54,7 @@ export default function App() {
     }
   }, []);
 
-  const getLocation = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== 'granted') {
-      setError('Permission to access location was denied');
-    }
-
-    let location = await Location.getCurrentPositionAsync({});
-    setLocation(location);
-  };
-
+  // This is what the component renders. Gets returned every time there is a render
   return (
     <View style={styles.container}>
       {(location && location.coords) ? (<>
@@ -63,6 +69,7 @@ export default function App() {
   );
 }
 
+// CSS
 const styles = StyleSheet.create({
   container: {
     flex: 1,

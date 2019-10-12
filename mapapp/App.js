@@ -16,14 +16,14 @@ export default function App() {
 
   const reload = async () => {
     while(true) {
-      _getLocationAsync();
+      getLocation();
 
       await sleep(100);
     }
   }
 
   const getVerse = async () => {
-    const response = await fetch("https://bibleapi.co/api/verses/kjv/gn/1/1");
+    const response = await fetch("https://bibleapi.co/api/verses/kjv/gn/3/3");
     const json = await response.json();
 
     Speech.speak(json.text);
@@ -39,7 +39,7 @@ export default function App() {
     }
   }, []);
 
-  const _getLocationAsync = async () => {
+  const getLocation = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
       setError('Permission to access location was denied');
@@ -49,19 +49,13 @@ export default function App() {
     setLocation(location);
   };
 
-  if (error) {
-    text = error;
-  } else if (location) {
-    text = location;
-  }
-
   return (
     <View style={styles.container}>
-      {text.coords ? (<>
+      {(location && location.coords) ? (<>
         <Text style={styles.paragraph}>Latitude</Text>
-        <Text style={styles.paragraph}>{text.coords.latitude}</Text>
+        <Text style={styles.paragraph}>{location.coords.latitude}</Text>
         <Text style={styles.paragraph}>Longitude</Text>
-        <Text style={styles.paragraph}>{text.coords.longitude}</Text>
+        <Text style={styles.paragraph}>{location.coords.longitude}</Text>
       </>) : (
         <Text>Loading...</Text>
       )}
